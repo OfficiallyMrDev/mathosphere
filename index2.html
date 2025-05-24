@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mathosphere Puzzle</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cosmic-blue: #00d4ff;
+      --neon-purple: #9d00ff;
+      --stardust: #ff4da6;
+      --galaxy-dark: #0f0c29;
+      --void-black: #000119;
+      --success-green: #00ff88;
+    }
+
+    body {
+      font-family: 'Quicksand', sans-serif;
+      background: linear-gradient(to bottom, var(--galaxy-dark), var(--void-black));
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      overflow: hidden;
+    }
+
+    /* Start Menu Styles */
+    .start-menu {
+      position: relative;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 20px;
+      width: 90%;
+      max-width: 500px;
+      padding: 2rem;
+      box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+      border: 1px solid var(--cosmic-blue);
+      text-align: center;
+      z-index: 10;
+      animation: fadeIn 1s;
+    }
+
+    .start-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(to right, var(--cosmic-blue), var(--neon-purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: 2px;
+      text-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
+    }
+
+    .start-subtitle {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      opacity: 0.8;
+    }
+
+    .start-btn {
+      background: linear-gradient(45deg, var(--neon-purple), var(--stardust));
+      color: white;
+      border: none;
+      padding: 15px 40px;
+      font-size: 1.2rem;
+      border-radius: 50px;
+      cursor: pointer;
+      margin: 1rem 0;
+      font-family: 'Orbitron', sans-serif;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      box-shadow: 0 0 20px rgba(157, 0, 255, 0.5);
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .start-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 30px rgba(255, 77, 166, 0.7);
+    }
+
+    /* Puzzle Window Styles */
+    .puzzle-container {
+      position: relative;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 20px;
+      width: 90%;
+      max-width: 500px;
+      padding: 2rem;
+      box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+      border: 1px solid var(--cosmic-blue);
+      text-align: center;
+      z-index: 10;
+      display: none;
+    }
+
+    .puzzle-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(to right, var(--cosmic-blue), var(--neon-purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: 1px;
+    }
+
+    .puzzle-clue {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 10px;
+      border-left: 3px solid var(--cosmic-blue);
+      text-align: left;
+      font-size: 1.1rem;
+    }
+
+    .puzzle-input {
+      background: rgba(255, 255, 255, 0.9);
+      border: none;
+      padding: 12px;
+      width: 80px;
+      text-align: center;
+      font-size: 1.2rem;
+      border-radius: 8px;
+      margin: 1rem 0;
+    }
+
+    .puzzle-btn {
+      background: linear-gradient(45deg, var(--neon-purple), var(--stardust));
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      margin: 0.5rem;
+      border-radius: 50px;
+      cursor: pointer;
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .puzzle-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(157, 0, 255, 0.4);
+    }
+
+    .hint-text {
+      color: var(--stardust);
+      font-style: italic;
+      margin-top: 1rem;
+      display: none;
+    }
+
+    /* Success Portal Styles */
+    .success-portal {
+      position: relative;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 50%;
+      width: 90vmin;
+      height: 90vmin;
+      max-width: 500px;
+      max-height: 500px;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 3rem;
+      box-shadow: 
+        0 0 60px rgba(157, 0, 255, 0.6),
+        inset 0 0 20px rgba(0, 212, 255, 0.3);
+      border: 2px solid var(--cosmic-blue);
+      animation: pulse 6s infinite alternate;
+      z-index: 20;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 60px rgba(157, 0, 255, 0.6), inset 0 0 20px rgba(0, 212, 255, 0.3); }
+      50% { box-shadow: 0 0 90px rgba(255, 77, 166, 0.7), inset 0 0 30px rgba(0, 212, 255, 0.5); }
+      100% { box-shadow: 0 0 60px rgba(0, 212, 255, 0.8), inset 0 0 20px rgba(157, 0, 255, 0.4); }
+    }
+
+    .portal-message {
+      font-size: 1.4rem;
+      line-height: 1.8;
+      margin-bottom: 2rem;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+      position: relative;
+      z-index: 2;
+    }
+
+    .portal-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 3.5rem;
+      font-weight: 700;
+      margin: 1rem 0;
+      background: linear-gradient(to right, var(--cosmic-blue), var(--neon-purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 15px rgba(0, 212, 255, 0.7);
+      letter-spacing: 2px;
+      position: relative;
+      animation: titleGlow 3s infinite alternate;
+    }
+
+    @keyframes titleGlow {
+      0% { text-shadow: 0 0 15px rgba(0, 212, 255, 0.7); }
+      100% { text-shadow: 0 0 25px rgba(157, 0, 255, 0.9); }
+    }
+
+    .portal-subtitle {
+      font-size: 1.2rem;
+      letter-spacing: 3px;
+      color: var(--cosmic-blue);
+      margin-top: -1rem;
+      margin-bottom: 2rem;
+    }
+
+    .portal-btn {
+      background: linear-gradient(45deg, var(--neon-purple), var(--stardust));
+      color: white;
+      border: none;
+      padding: 15px 40px;
+      font-size: 1.1rem;
+      border-radius: 50px;
+      cursor: pointer;
+      margin-top: 1rem;
+      font-family: 'Orbitron', sans-serif;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      box-shadow: 0 0 20px rgba(157, 0, 255, 0.5);
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    /* Cosmic particles */
+    .cosmic-particle {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--cosmic-blue), transparent 70%);
+      opacity: 0;
+      z-index: 1;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+      10% { opacity: 0.8; }
+      100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+    }
+
+    /* Portal rings */
+    .portal-ring {
+      position: absolute;
+      border: 2px solid;
+      border-radius: 50%;
+      animation: rotate infinite linear;
+      opacity: 0.3;
+    }
+
+    .ring-1 {
+      width: 110%;
+      height: 110%;
+      border-color: var(--cosmic-blue);
+      animation-duration: 40s;
+    }
+
+    .ring-2 {
+      width: 130%;
+      height: 130%;
+      border-color: var(--neon-purple);
+      animation-duration: 60s;
+      animation-direction: reverse;
+    }
+
+    .ring-3 {
+      width: 150%;
+      height: 150%;
+      border-color: var(--stardust);
+      animation-duration: 80s;
+    }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Shake animation for wrong answers */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+      20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+
+    .shake {
+      animation: shake 0.5s;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* Sound Toggle */
+    .sound-toggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--cosmic-blue);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      z-index: 100;
+    }
+
+    .sound-toggle i {
+      font-size: 1.2rem;
+      color: var(--cosmic-blue);
+    }
+
+    @media (max-width: 600px) {
+      .start-title {
+        font-size: 2.2rem;
+      }
+      
+      .puzzle-title {
+        font-size: 1.8rem;
+      }
+      
+      .portal-message {
+        font-size: 1.1rem;
+      }
+      
+      .portal-title {
+        font-size: 2.5rem;
+      }
+      
+      .portal-subtitle {
+        font-size: 1rem;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+  <!-- Puzzle Selection Menu -->
+  <div id="puzzleMenu" class="puzzle-container">
+    <h1 class="puzzle-title">Choose Your Puzzle</h1>
+    <button class="puzzle-btn" onclick="startPuzzle('math')">Math Puzzle</button>
+    <button class="puzzle-btn" onclick="startPuzzle('pattern')">Number Pattern</button>
+    <button class="puzzle-btn" onclick="startPuzzle('word')">Word Puzzle</button>
+    <button class="puzzle-btn" onclick="startPuzzle('crossword')">Crossword</button>
+  </div>
+
+  <!-- Start Menu -->
+  <div id="startMenu" class="start-menu">
+    <h1 class="start-title">MATHOSPHERE</h1>
+    <div class="start-subtitle">Where numbers come alive</div>
+    <button id="startBtn" class="start-btn">BEGIN JOURNEY</button>
+  </div>
+
+  <!-- Puzzle Window -->
+  <div id="puzzleWindow" class="puzzle-container">
+    <h1 class="puzzle-title">MATHOSPHERE PUZZLE</h1>
+    <div id="timer" style="font-size: 1.1rem; margin-bottom: 1rem; color: var(--success-green); display: none;"></div>
+    <div id="clue1" class="puzzle-clue"></div>
+    <div id="clue2" class="puzzle-clue"></div>
+    <div id="clue3" class="puzzle-clue"></div>
+    
+    <input type="number" id="userAnswer" class="puzzle-input" placeholder="?" min="10" max="99">
+    <div>
+      <button id="submitBtn" class="puzzle-btn">SUBMIT</button>
+      <button id="hintBtn" class="puzzle-btn">HINT</button>
+    </div>
+    <div id="hintText" class="hint-text"></div>
+  </div>
+
+  <!-- Success Portal -->
+  <div id="successPortal" class="success-portal">
+    <div class="portal-ring ring-1"></div>
+    <div class="portal-ring ring-2"></div>
+    <div class="portal-ring ring-3"></div>
+    
+    <div class="portal-message">
+      "Just like that puzzle, every problem has a solution — welcome to the world where numbers spark curiosity and imagination! Cracked the code — now let's unlock the wonders of math!"
+    </div>
+    
+    <div class="portal-title">MATHOSPHERE</div>
+    <div class="portal-subtitle">WHERE NUMBERS COME ALIVE</div>
+    
+    <button id="newPuzzleBtn" class="portal-btn">RESTART</button>
+  </div>
+
+
+  <script>
+    // Game state
+    let currentPuzzle = null;
+    let hintsGiven = 0;
+    const MAX_HINTS = 3;
+    let currentPuzzleType = null;
+    let timerInterval;
+    let timeRemaining = 60;
+
+    // DOM elements
+    const startMenu = document.getElementById('startMenu');
+    const puzzleMenu = document.getElementById('puzzleMenu');
+    const puzzleWindow = document.getElementById('puzzleWindow');
+    const successPortal = document.getElementById('successPortal');
+    const userAnswer = document.getElementById('userAnswer');
+    const submitBtn = document.getElementById('submitBtn');
+    const hintBtn = document.getElementById('hintBtn');
+    const hintText = document.getElementById('hintText');
+    const newPuzzleBtn = document.getElementById('newPuzzleBtn');
+    const startBtn = document.getElementById('startBtn');
+
+    // Start game: go to puzzle selection menu
+    startBtn.addEventListener('click', () => {
+      startMenu.style.display = 'none';
+      puzzleMenu.style.display = 'block';
+    });
+
+    // Puzzle selection handler
+    function startPuzzle(type) {
+      currentPuzzleType = type;
+      puzzleMenu.style.display = 'none';
+      puzzleWindow.style.display = 'block';
+      generatePuzzleType(type);
+      startTimer();
+    }
+
+    // Generate puzzle based on type
+    function generatePuzzleType(type) {
+      hintsGiven = 0;
+      hintText.style.display = 'none';
+      userAnswer.value = '';
+      // Default: show all clues, hide unused
+      document.getElementById('clue1').style.display = 'block';
+      document.getElementById('clue2').style.display = 'block';
+      document.getElementById('clue3').style.display = 'block';
+      userAnswer.type = 'number';
+      userAnswer.placeholder = '?';
+      userAnswer.min = '';
+      userAnswer.max = '';
+      if (type === 'math') {
+        // Classic math puzzle (same as before)
+        const onesDigit = Math.floor(Math.random() * 4) + 1; // 1-4
+        const tensDigit = 2 * onesDigit;
+        const number = tensDigit * 10 + onesDigit;
+        currentPuzzle = {
+          answer: number,
+          clues: [
+            "I am a two-digit number.",
+            `My tens digit is double my ones digit.`,
+            `The sum of my digits is ${tensDigit + onesDigit}.`
+          ],
+          hints: [
+            `The ones digit is between ${onesDigit} and ${onesDigit + 2}.`,
+            `The number is between ${number - 10} and ${number + 10}.`,
+            `The tens digit is ${tensDigit}.`
+          ]
+        };
+        document.getElementById('clue1').textContent = currentPuzzle.clues[0];
+        document.getElementById('clue2').textContent = currentPuzzle.clues[1];
+        document.getElementById('clue3').textContent = currentPuzzle.clues[2];
+      } else if (type === 'pattern') {
+        // Number pattern puzzle
+        // Example: What comes next? 2, 4, 8, 16, ?
+        currentPuzzle = {
+          answer: 32,
+          clues: [
+            "What number comes next in the pattern?",
+            "2, 4, 8, 16, ?",
+            "Each number is double the previous one."
+          ],
+          hints: [
+            "Think about multiplication.",
+            "It's a power of 2.",
+            "The previous number was 16."
+          ]
+        };
+        document.getElementById('clue1').textContent = currentPuzzle.clues[0];
+        document.getElementById('clue2').textContent = currentPuzzle.clues[1];
+        document.getElementById('clue3').textContent = currentPuzzle.clues[2];
+      } else if (type === 'word') {
+        // Word puzzle (riddle style)
+        // Example: What 5-letter word becomes shorter when you add two letters to it?
+        currentPuzzle = {
+          answer: "short",
+          clues: [
+            "What 5-letter word becomes shorter when you add two letters to it?",
+            "",
+            ""
+          ],
+          hints: [
+            "It's a play on words.",
+            "The answer is a word describing size.",
+            "Add 'er' to the end."
+          ]
+        };
+        document.getElementById('clue1').textContent = currentPuzzle.clues[0];
+        document.getElementById('clue2').textContent = '';
+        document.getElementById('clue2').style.display = 'none';
+        document.getElementById('clue3').textContent = '';
+        document.getElementById('clue3').style.display = 'none';
+        userAnswer.type = 'text';
+        userAnswer.placeholder = 'your answer';
+      } else if (type === 'crossword') {
+        currentPuzzle = {
+          answer: 'math',
+          clues: [
+            "4-letter word for the subject you are solving now.",
+            "",
+            ""
+          ],
+          hints: [
+            "It starts with 'm'.",
+            "It is logical and involves numbers.",
+            "It ends with 'h'."
+          ]
+        };
+        document.getElementById('clue1').textContent = currentPuzzle.clues[0];
+        document.getElementById('clue2').style.display = 'none';
+        document.getElementById('clue3').style.display = 'none';
+        userAnswer.type = 'text';
+        userAnswer.placeholder = 'Enter word';
+      }
+    }
+
+    // Check answer logic
+    submitBtn.addEventListener('click', () => {
+      const answerRaw = userAnswer.value;
+      let correct = false;
+      if (!currentPuzzle) return;
+      if (currentPuzzleType === 'word' || currentPuzzleType === 'crossword') {
+        // Case-insensitive, accept only correct answer
+        correct = answerRaw.trim().toLowerCase() === currentPuzzle.answer;
+      } else {
+        correct = parseInt(answerRaw) === currentPuzzle.answer;
+      }
+      if (correct) {
+        clearInterval(timerInterval);
+        puzzleWindow.style.display = 'none';
+        successPortal.style.display = 'flex';
+        createCelebration();
+      } else {
+        userAnswer.classList.add('shake');
+        userAnswer.style.border = '2px solid var(--stardust)';
+        setTimeout(() => {
+          userAnswer.classList.remove('shake');
+          userAnswer.style.border = 'none';
+        }, 500);
+      }
+    });
+
+    // Show hint
+    hintBtn.addEventListener('click', () => {
+      if (!currentPuzzle) return;
+      if (hintsGiven < currentPuzzle.hints.length) {
+        hintText.textContent = currentPuzzle.hints[hintsGiven];
+        hintText.style.display = 'block';
+        hintsGiven++;
+        createParticles(hintBtn);
+      } else {
+        hintText.textContent = "No more hints available! Think carefully!";
+      }
+    });
+
+    // Restart: return to start menu
+    newPuzzleBtn.addEventListener('click', () => {
+      clearInterval(timerInterval);
+      successPortal.style.display = 'none';
+      startMenu.style.display = 'block';
+    });
+
+    // Timer logic
+    function startTimer() {
+      clearInterval(timerInterval);
+      timeRemaining = 60;
+      const timerDisplay = document.getElementById('timer');
+      timerDisplay.style.display = 'block';
+      timerDisplay.textContent = `Time Left: ${timeRemaining}s`;
+
+      timerInterval = setInterval(() => {
+        timeRemaining--;
+        timerDisplay.textContent = `Time Left: ${timeRemaining}s`;
+        if (timeRemaining <= 0) {
+          clearInterval(timerInterval);
+          puzzleWindow.style.display = 'none';
+          successPortal.style.display = 'flex';
+          document.querySelector('.portal-message').textContent = "Time's up! Try again!";
+        }
+      }, 1000);
+    }
+
+    // Celebration effects
+    function createCelebration() {
+      for (let i = 0; i < 100; i++) {
+        setTimeout(() => {
+          createParticle();
+        }, i * 30);
+      }
+    }
+
+    function createParticle(element = null) {
+      const particle = document.createElement('div');
+      particle.className = 'cosmic-particle';
+      if (element) {
+        const rect = element.getBoundingClientRect();
+        particle.style.left = rect.left + rect.width/2 + 'px';
+        particle.style.top = rect.top + rect.height/2 + 'px';
+      } else {
+        particle.style.left = Math.random() * 100 + 'vw';
+        particle.style.top = Math.random() * 100 + 'vh';
+      }
+      particle.style.width = Math.random() * 15 + 5 + 'px';
+      particle.style.height = particle.style.width;
+      particle.style.backgroundColor =
+        [`var(--cosmic-blue)`, `var(--neon-purple)`, `var(--stardust)`][Math.floor(Math.random() * 3)];
+      particle.style.animation = `float ${Math.random() * 3 + 2}s linear forwards`;
+      document.body.appendChild(particle);
+      setTimeout(() => particle.remove(), 3000);
+    }
+
+    function createParticles(element) {
+      for (let i = 0; i < 20; i++) {
+        setTimeout(() => createParticle(element), i * 50);
+      }
+    }
+
+    // Initialize game with start menu visible
+    startMenu.style.display = 'block';
+    puzzleMenu.style.display = 'none';
+    puzzleWindow.style.display = 'none';
+    successPortal.style.display = 'none';
+  </script>
+</body>
+</html>
