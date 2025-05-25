@@ -169,7 +169,7 @@
       justify-content: center;
       align-items: center;
       text-align: center;
-      padding: 3rem;
+      padding: 4rem;
       box-shadow: 
         0 0 60px rgba(157, 0, 255, 0.6),
         inset 0 0 20px rgba(0, 212, 255, 0.3);
@@ -185,17 +185,18 @@
     }
 
     .portal-message {
-      font-size: 1.4rem;
+      font-size: 1.8rem;
       line-height: 1.8;
       margin-bottom: 2rem;
       text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
       position: relative;
       z-index: 2;
+      text-align: center;
     }
 
     .portal-title {
       font-family: 'Orbitron', sans-serif;
-      font-size: 3.5rem;
+      font-size: 4rem;
       font-weight: 700;
       margin: 1rem 0;
       background: linear-gradient(to right, var(--cosmic-blue), var(--neon-purple));
@@ -203,7 +204,7 @@
       background-clip: text;
       color: transparent;
       text-shadow: 0 0 15px rgba(0, 212, 255, 0.7);
-      letter-spacing: 2px;
+      letter-spacing: 3px;
       position: relative;
       animation: titleGlow 3s infinite alternate;
     }
@@ -214,7 +215,7 @@
     }
 
     .portal-subtitle {
-      font-size: 1.2rem;
+      font-size: 1.6rem;
       letter-spacing: 3px;
       color: var(--cosmic-blue);
       margin-top: -1rem;
@@ -333,21 +334,17 @@
       .start-title {
         font-size: 2.2rem;
       }
-      
       .puzzle-title {
         font-size: 1.8rem;
       }
-      
-      .portal-message {
-        font-size: 1.1rem;
-      }
-      
       .portal-title {
-        font-size: 2.5rem;
+        font-size: 3rem;
       }
-      
       .portal-subtitle {
-        font-size: 1rem;
+        font-size: 1.4rem;
+      }
+      .portal-message {
+        font-size: 1.4rem;
       }
     }
   </style>
@@ -398,8 +395,6 @@
     
     <div class="portal-title">MATHOSPHERE</div>
     <div class="portal-subtitle">WHERE NUMBERS COME ALIVE</div>
-    
-    <button id="newPuzzleBtn" class="portal-btn">RESTART</button>
   </div>
 
 
@@ -570,18 +565,13 @@
         hintText.textContent = currentPuzzle.hints[hintsGiven];
         hintText.style.display = 'block';
         hintsGiven++;
-        createParticles(hintBtn);
+        createParticles(hintBtn); 
       } else {
         hintText.textContent = "No more hints available! Think carefully!";
       }
     });
 
-    // Restart: return to start menu
-    newPuzzleBtn.addEventListener('click', () => {
-      clearInterval(timerInterval);
-      successPortal.style.display = 'none';
-      startMenu.style.display = 'block';
-    });
+    // (Restart button logic removed)
 
     // Timer logic
     function startTimer() {
